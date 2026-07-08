@@ -1,0 +1,155 @@
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy-case-d
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - shib-idp
+      - sp-saml
+      - aa-api
+      - satosa-proxy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ldap:
+    build:
+      context: ./idp-shibb/ldap-image
+    container_name: shib-ldap-case-d
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    environment:
+      LDAP_ORGANISATION: "GIdLab"
+      LDAP_DOMAIN: "gidlab.rnp.br"
+      LDAP_ADMIN_PASSWORD: "admin"
+    ports:
+      - "3890:389"
+
+  shib-idp:
+    build:
+      context: ./idp-shibb
+    container_name: shib-idp-case-d
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1280M
+    environment:
+      JETTY_BROWSER_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_MAX_HEAP: 1024m
+    ports:
+      - "4443:4443"
+      - "8443:8443"
+    volumes:
+      - ./idp-shibb/metadata/sp-saml-metadata.xml:/opt/shibboleth-idp/metadata/sp-saml-metadata.xml
+    depends_on:
+      - ldap
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      default:
+        aliases:
+          - idp-saml
+
+  aa-api:
+    build:
+      context: ./aa-api
+    container_name: aa-api-case-d
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # AA so na rede aa_internal - so o satosa-proxy tambem esta nela
+    networks:
+      - aa_internal
+
+  satosa-proxy:
+    build:
+      context: ./satosa
+    container_name: satosa-proxy-case-d
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    ports:
+      - "8001:8000"
+    depends_on:
+      - shib-idp
+      - aa-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - default
+      - aa_internal
+
+  sp-saml:
+    build:
+      context: ./sp-saml
+    container_name: sp-saml-case-d
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "5000:5000"
+    depends_on:
+      - satosa-proxy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Stubs de rede simulando IdPs extras atras do proxy, N=3.
+  # Propositalmente sem aa_internal - so o proxy precisa dessa rota.
+  shib-idp-fed2:
+    image: alpine:3.20
+    container_name: shib-idp-fed2-case-d
+    command: ["sleep", "infinity"]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 32M
+    networks:
+      - default
+
+  shib-idp-fed3:
+    image: alpine:3.20
+    container_name: shib-idp-fed3-case-d
+    command: ["sleep", "infinity"]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 32M
+    networks:
+      - default
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  default: {}
+  # so AA e proxy nessa rede
+  aa_internal: {}

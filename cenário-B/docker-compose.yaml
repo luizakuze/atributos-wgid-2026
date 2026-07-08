@@ -1,0 +1,137 @@
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy-case-b
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - shib-idp
+      - sp-saml
+      - aa-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ldap:
+    build:
+      context: ./idp-shibb/ldap-image
+    container_name: shib-ldap-case-b
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    environment:
+      LDAP_ORGANISATION: "GIdLab"
+      LDAP_DOMAIN: "gidlab.rnp.br"
+      LDAP_ADMIN_PASSWORD: "admin"
+    ports:
+      - "3890:389"
+
+  shib-idp:
+    build:
+      context: ./idp-shibb
+    container_name: shib-idp-case-b
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1280M
+    environment:
+      JETTY_BROWSER_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_MAX_HEAP: 1024m
+    ports:
+      - "4443:4443"
+      - "8443:8443"
+    volumes:
+      - ./idp-shibb/metadata/sp-saml-metadata.xml:/opt/shibboleth-idp/metadata/sp-saml-metadata.xml
+    depends_on:
+      - ldap
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      default:
+        aliases:
+          - idp-saml
+      aa_internal: {}
+
+  aa-api:
+    build:
+      context: ./aa-api
+    container_name: aa-api-case-b
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # so o shib-idp e a AA ficam na rede aa_internal
+    networks:
+      - aa_internal
+
+  sp-saml:
+    build:
+      context: ./sp-saml
+    container_name: sp-saml-case-b
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "5000:5000"
+    depends_on:
+      - shib-idp
+      - aa-api
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Stubs de rede (sem SAML funcional) simulando IdPs extras na
+  # federacao, N=3 - ver README.md > Superfície de confiança da AA.
+  shib-idp-fed2:
+    image: alpine:3.20
+    container_name: shib-idp-fed2-case-b
+    command: ["sleep", "infinity"]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 32M
+    networks:
+      default: {}
+      aa_internal: {}
+
+  shib-idp-fed3:
+    image: alpine:3.20
+    container_name: shib-idp-fed3-case-b
+    command: ["sleep", "infinity"]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 32M
+    networks:
+      default: {}
+      aa_internal: {}
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  default: {}
+  aa_internal: {}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<afp:AttributeFilterPolicyGroup
+    id="ShibbolethFilterPolicy"
+    xmlns:afp="urn:mace:shibboleth:2.0:afp"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp/shibboleth-afp.xsd">
+
+    <afp:AttributeFilterPolicy id="releaseAttributesToSPFlask">
+
+        <afp:PolicyRequirementRule xsi:type="afp:Requester"
+            value="https://sp-saml.gidlab.rnp.br/saml/metadata" />
+
+        <afp:AttributeRule attributeID="uid">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+        <afp:AttributeRule attributeID="cn">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+        <afp:AttributeRule attributeID="displayName">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+        <afp:AttributeRule attributeID="givenName">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+        <afp:AttributeRule attributeID="sn">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+        <afp:AttributeRule attributeID="mail">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+        <afp:AttributeRule attributeID="eduPersonPrincipalName">
+            <afp:PermitValueRule xsi:type="afp:ANY" />
+        </afp:AttributeRule>
+
+    </afp:AttributeFilterPolicy>
+
+</afp:AttributeFilterPolicyGroup>

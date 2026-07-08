@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Metadata local do proxy de identidade (SATOSA) atuando como IdP
+     perante o SP real (cenário D - agregação pelo proxy).
+     Gerada localmente para este laboratório; não faz parte do
+     agregado real da federação GIdLab.
+-->
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    entityID="https://proxy-wgid.gidlab.rnp.br/Saml2IDP/proxy.xml">
+    <IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIDPzCCAiegAwIBAgIUfu87nGcbgQNSbls1K2Y/uTw1XXQwDQYJKoZIhvcNAQELBQAwLzEPMA0GA1UECgwGR0lkTGFiMRwwGgYDVQQDDBNwcm94eS5naWRsYWIucm5wLmJyMB4XDTI2MDcwMjA2MjIxOFoXDTM2MDYyOTA2MjIxOFowLzEPMA0GA1UECgwGR0lkTGFiMRwwGgYDVQQDDBNwcm94eS5naWRsYWIucm5wLmJyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvFBkIaLr9nmz+7KKKERl/PZWOgCfosz/DKv2ULLa31gfhxF6gTc8S0r9JJj9IYG0KFJ/hHC1tgOiSCqsulzcGw46XDYp7NptDOELswlET5CGh4OT5jfX2Fp8j4IoFVt3HHfhIjLiHsG70xTDKK2U9Yz4OiTFitgAzonHSWjlRkhtQ6JHATpHYkZ73e0VdHGwWHmbiMzRLrjkBvlfX7M88W7bKhHaIh3fy0CepF5Wuxmnv/Ulgva0Gox5N4dLIl/rwl4JpR97DNrXpgHpr+VD9w5FmRC8MTkYAcA2zQXNokI61DxlWu/JtcijCtxwnPoZsb1DSjutqCh20k0qjNW+kwIDAQABo1MwUTAdBgNVHQ4EFgQUUWLIR/t+R5Xd1NZi8eT6ndGpPz4wHwYDVR0jBBgwFoAUUWLIR/t+R5Xd1NZi8eT6ndGpPz4wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEABq1od8S/Zy95E1s9bJ7zCWNTc8KQsJAYQqQEIEKXUWljNs1emYPSnBKbJGw3iFOVMr03xjJHwX30eULz7hzwMxWSOZGhiNVV4WOuuFz9E1IyROIm0Rs2z9Dq2DkH5hd18sBW0u5Lecei802mvjjnlTlDvfgY7BmERJSRRD51DsRRSIsZ1igdtMS2kMMAOa2fjUcuDzbs1zqPZNkZJM8VuehkDfgslPxo/9sq15TlrH//ztqgEBHysttndQc5Z2pcp4W94DxRQ/OOuy9hROAeEJwozviq1yB0giKWdfhTt/ra+TFGaj7t7ZyP/UbdzBgPkYteXvdaYCvc0UXqPtbV5g==</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+        <!-- O SATOSA registra os endpoints de SSO do frontend usando o
+             nome do BACKEND no path (não o nome do frontend) - ver
+             satosa.frontends.saml2.SAMLFrontend._register_endpoints -->
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="https://proxy-wgid.gidlab.rnp.br/Saml2/sso/redirect" />
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://proxy-wgid.gidlab.rnp.br/Saml2/sso/post" />
+    </IDPSSODescriptor>
+    <Organization>
+        <OrganizationName xml:lang="pt-BR">GIdLab</OrganizationName>
+        <OrganizationDisplayName xml:lang="pt-BR">GIdLab - Proxy de Identidade (Cenário D)</OrganizationDisplayName>
+        <OrganizationURL xml:lang="pt-BR">https://proxy-wgid.gidlab.rnp.br</OrganizationURL>
+    </Organization>
+    <ContactPerson contactType="technical">
+        <GivenName>GIdLab</GivenName>
+        <EmailAddress>gidlab@rnp.br</EmailAddress>
+    </ContactPerson>
+</EntityDescriptor>

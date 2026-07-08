@@ -1,0 +1,41 @@
+module: satosa.frontends.saml2.SAMLFrontend
+name: Saml2IDP
+config:
+  endpoints:
+    single_sign_on_service:
+      'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST': sso/post
+      'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect': sso/redirect
+
+  entityid_endpoint: true
+  enable_metadata_reload: no
+
+  idp_config:
+    organization: {display_name: GIdLab, name: GIdLab, url: 'https://proxy-wgid.gidlab.rnp.br'}
+    contact_person:
+      - {contact_type: technical, email_address: 'mailto:gidlab@rnp.br', given_name: GIdLab}
+    key_file: /opt/satosa/etc/frontend.key
+    cert_file: /opt/satosa/etc/frontend.crt
+    metadata:
+      local: [sp.xml]
+
+    entityid: https://proxy-wgid.gidlab.rnp.br/Saml2IDP/proxy.xml
+    accepted_time_diff: 60
+    service:
+      idp:
+        endpoints:
+          single_sign_on_service: []
+        name: "GIdLab Proxy (frontend)"
+        name_id_format:
+          - 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+          - 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
+        policy:
+          default:
+            attribute_restrictions: null
+            fail_on_missing_requested: false
+            lifetime: {minutes: 15}
+            name_form: urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+            # A SP real exige asserção cifrada (wantAssertionsEncrypted=True em
+            # sp-saml/app.py); a cifragem usa a chave pública de encryption
+            # publicada na metadata local do SP (sp.xml).
+            encrypt_assertion: true
+            encrypted_advice_attributes: false

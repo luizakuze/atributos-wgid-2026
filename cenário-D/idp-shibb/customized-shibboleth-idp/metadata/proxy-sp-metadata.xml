@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+     Metadata local do proxy de identidade (SATOSA) atuando como SP
+     perante o IdP/Shibboleth real (cenário D - agregação pelo proxy).
+     Gerada localmente para este laboratório; não faz parte do
+     agregado real da federação GIdLab.
+-->
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    entityID="https://proxy-wgid.gidlab.rnp.br/Saml2/proxy_saml2_backend.xml">
+    <SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true"
+        protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIDPzCCAiegAwIBAgIUGHc3/XyLvRQe47xRUvj96x6TZqIwDQYJKoZIhvcNAQELBQAwLzEPMA0GA1UECgwGR0lkTGFiMRwwGgYDVQQDDBNwcm94eS5naWRsYWIucm5wLmJyMB4XDTI2MDcwMjA2MjIxOFoXDTM2MDYyOTA2MjIxOFowLzEPMA0GA1UECgwGR0lkTGFiMRwwGgYDVQQDDBNwcm94eS5naWRsYWIucm5wLmJyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7NmXMsjTRhNnQgjVBUV9W2tIKafVx2EjTiDSsARNd5GWj4JCUkJT8d6gL4C3OF+IuvOsLbW5ZsKPKs4rFYpQYLq8RIv/2sNifQAACwTX8BURmIE7j6cbtR415GrYCnt/OXUnptdhPfo1llUgvqzuIRDCu+TGzWBdyJTwKlryZ6iUdNzFGgin7hgD1dXnfGHsj9QFJyrDHyRCLiEyczZlxaTchbGOd5Ue1Je1FDJQcBMBkaFe/1ht9WQRQwMStLAayj+ZlQmq48A7n3gkVWTlIDw5R1Q0CfJ+Nc3G5TAs01tvAuuC99Mmq3pFzb7+m4ajau1dPRdQ/CXM88tDaWYSTwIDAQABo1MwUTAdBgNVHQ4EFgQUlY+UWiwnpmpinRMCwez8bc0jQ7gwHwYDVR0jBBgwFoAUlY+UWiwnpmpinRMCwez8bc0jQ7gwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAZMtVf0uAFIctzZHFO04+pBORO36IIGKCviqiZilZM85f4OrKWorl3PaTRNXA4xccxgGUZo8xfS6yjTHPSfmQRCHO6rCVuHtbgYO/9iZHZc67GDnddarOVtb+uOpnGSEVqQ54hOTbw8YQ/XHAvYkOS/gCNfO2mXZiipx/FWsBEexPSUDpHkZOAQNl6nc0ghkncAf8yyF8PbSGaMxGY57p0Vqg1LAfZ+RFhIsPSLivLmUiZ0Wc/Zyn6O1o8n3ESwr2mY8fketYVssnq60xx6qIC1Evqd3lyZo64JXfl6C0XfsaC7GbtBTj/hCogW36eE+XPZmjjDy3+s7fxy0dyShlzg==</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+        <KeyDescriptor use="encryption">
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>MIIDPzCCAiegAwIBAgIUGHc3/XyLvRQe47xRUvj96x6TZqIwDQYJKoZIhvcNAQELBQAwLzEPMA0GA1UECgwGR0lkTGFiMRwwGgYDVQQDDBNwcm94eS5naWRsYWIucm5wLmJyMB4XDTI2MDcwMjA2MjIxOFoXDTM2MDYyOTA2MjIxOFowLzEPMA0GA1UECgwGR0lkTGFiMRwwGgYDVQQDDBNwcm94eS5naWRsYWIucm5wLmJyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA7NmXMsjTRhNnQgjVBUV9W2tIKafVx2EjTiDSsARNd5GWj4JCUkJT8d6gL4C3OF+IuvOsLbW5ZsKPKs4rFYpQYLq8RIv/2sNifQAACwTX8BURmIE7j6cbtR415GrYCnt/OXUnptdhPfo1llUgvqzuIRDCu+TGzWBdyJTwKlryZ6iUdNzFGgin7hgD1dXnfGHsj9QFJyrDHyRCLiEyczZlxaTchbGOd5Ue1Je1FDJQcBMBkaFe/1ht9WQRQwMStLAayj+ZlQmq48A7n3gkVWTlIDw5R1Q0CfJ+Nc3G5TAs01tvAuuC99Mmq3pFzb7+m4ajau1dPRdQ/CXM88tDaWYSTwIDAQABo1MwUTAdBgNVHQ4EFgQUlY+UWiwnpmpinRMCwez8bc0jQ7gwHwYDVR0jBBgwFoAUlY+UWiwnpmpinRMCwez8bc0jQ7gwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAZMtVf0uAFIctzZHFO04+pBORO36IIGKCviqiZilZM85f4OrKWorl3PaTRNXA4xccxgGUZo8xfS6yjTHPSfmQRCHO6rCVuHtbgYO/9iZHZc67GDnddarOVtb+uOpnGSEVqQ54hOTbw8YQ/XHAvYkOS/gCNfO2mXZiipx/FWsBEexPSUDpHkZOAQNl6nc0ghkncAf8yyF8PbSGaMxGY57p0Vqg1LAfZ+RFhIsPSLivLmUiZ0Wc/Zyn6O1o8n3ESwr2mY8fketYVssnq60xx6qIC1Evqd3lyZo64JXfl6C0XfsaC7GbtBTj/hCogW36eE+XPZmjjDy3+s7fxy0dyShlzg==</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+        <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://proxy-wgid.gidlab.rnp.br/Saml2/acs/post" index="1" isDefault="true" />
+    </SPSSODescriptor>
+    <Organization>
+        <OrganizationName xml:lang="pt-BR">GIdLab</OrganizationName>
+        <OrganizationDisplayName xml:lang="pt-BR">GIdLab - Proxy de Identidade (Cenário D)</OrganizationDisplayName>
+        <OrganizationURL xml:lang="pt-BR">https://proxy-wgid.gidlab.rnp.br</OrganizationURL>
+    </Organization>
+    <ContactPerson contactType="technical">
+        <GivenName>GIdLab</GivenName>
+        <EmailAddress>gidlab@rnp.br</EmailAddress>
+    </ContactPerson>
+</EntityDescriptor>

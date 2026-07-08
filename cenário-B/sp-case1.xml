@@ -1,0 +1,35 @@
+<md:EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+    entityID="https://idp-saml.gidlab.rnp.br/realms/realm-sp"
+    ID="ID_1426c493-a211-4f14-a025-b285be46e942">
+    <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"
+        AuthnRequestsSigned="true" WantAssertionsSigned="true">
+        <md:KeyDescriptor use="signing">
+            <ds:KeyInfo>
+                <ds:KeyName>uTkkTIIpOvOSoPd3Vhe3I-dZcWi9QLObBybq3VCQMAw</ds:KeyName>
+                <ds:X509Data>
+                    <ds:X509Certificate>
+                        MIICnzCCAYcCBgGe9hF/4jANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDDAhyZWFsbS1zcDAeFw0yNjA2MjMxOTU4MjJaFw0zNjA2MjMyMDAwMDJaMBMxETAPBgNVBAMMCHJlYWxtLXNwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArAO+Jj4PG+zKLGrGDcQKqWCSIbt92TjfmNYOxk/TbPeClBH0nxmF8mlzBvBwvhYavnPywPxKbBviTYEcPT9VPIKQq70/E36sKNLfa8lg5ERicOEah4vMGMRx1+VjL/QqvqIUpecr/sct23ff2D3TMpUqhhR1wRxDcjqJxWlcTfVXHV8xbaw+3roQQsp9tTkRsDPs+vEUu4dFW4hxGWt9S47fHfVwoVLs3GUDIu1JSI59Rx98EKEQ2c0E9jm7FyS/M4Jh4C0Tp7u3a9R2Pw1W1EHJ9q2BQ7ZP/SN1jXsjTL/KDmxljbSEFIoBkbj9tp9qfqMvBcGgFfcnPxLunSMWqQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQCMTmKDWw+AzRMu6enyTmDqmnWRLv2Ycrtjo1zMh09L6uAYA8fyYC30HMlvT7YmYYg+cLiMOUWlon4OXYmv9O8fwz57Uj10LW/KzyPZ/+JEKNFpDfMAasuWPPZylWyLMwAz7rV3MXAfm5bmGzC46d47lxoobNc0TmRadHGphEeLbfqooHROcdFMX8MHqKbF2RzNcDJEs7ipAKcCvk4Rq0jWjkuAS+vJO3xUR0gxKWwKgRARBYOHi1dlzvvLtoin/3qCz5OaRYf3YtAStV4UiWHp5kSWWe2S/2yr1qOKlPf+6zPpIjPTZ11Hy9eDGTeupfj4OiSbdyknfA9J3wcpSIdu</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </md:KeyDescriptor>
+        <md:KeyDescriptor use="encryption">
+            <ds:KeyInfo>
+                <ds:KeyName>2OiXdHKaQX19aYwcEpF7fGFnGN6IJbClpsMPc9RWBZ8</ds:KeyName>
+                <ds:X509Data>
+                    <ds:X509Certificate>
+                        MIICnzCCAYcCBgGe9hGB3TANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDDAhyZWFsbS1zcDAeFw0yNjA2MjMxOTU4MjNaFw0zNjA2MjMyMDAwMDNaMBMxETAPBgNVBAMMCHJlYWxtLXNwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsm7KQqg+kMBaqSZ94hYg0c/gExDIBIaWczJ6Bd5oUGhpUkIAVqZjI0C9odOEImavj2Z11RLITKKUwOqG6Ce+N2evBg4+LReL3xECoR53ZF6lceUt3SjYs7m4JnmoVy1nk46Tl2U/bGOggESKzWP/NOBTo+bjjYwdgvtkH+FyzFSmrSAHb2XaXgq49SVeb7nCFrT3bdqV8g4i+oOF41vQcVZ3IZvfJQdrWbS2dS49yq6zGILdo9lOhsRRelaS8mpOyplAsqyqz3T7FYbJHut7fYd3P/n6/QLYxdms9OPCrnwlej1j8ScBVuqQ9k6cjjNhlOsTbzzroF4SNybZNfV7FwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBEFnxogimlkKeXNa/cfaKf4UNnX30BE+tRW0nkOPm1vudGpz5zBV/N2OCktg2u8OQYLLfSN9ZgaLR2M3J9/dTRFCb/T+T9u47/C04PpxNstQp8vggKW/HjhxT+xN8sgj+rEHq2sSChkhjxLsab+UbTSiIXsgmdZepn6SLMtplBlhmqjMTFbs/p6QpIPMnOCTQGWG3vVp8Q9dBwTQKKuFXIHjBZGYgVIhGGeq2OOu4CCCrArebcIPi5P5+HoiKDOe4QycPvNUHrGCtBVVHx6onoeHfYDtr47MIIdH7vktAmRAe+pQvejmukkDZI6zTdifPWkgc8xplmx8PPvtulNYw9</ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p" />
+            <md:EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#rsa-oaep" />
+        </md:KeyDescriptor>
+        <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+            Location="https://idp-saml.gidlab.rnp.br/realms/realm-sp/broker/shibboleth-idp/endpoint" />
+        <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+        <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+            Location="https://idp-saml.gidlab.rnp.br/realms/realm-sp/broker/shibboleth-idp/endpoint"
+            isDefault="true" index="1" />
+    </md:SPSSODescriptor>
+</md:EntityDescriptor>

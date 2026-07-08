@@ -1,0 +1,8 @@
+module: aa_aggregation.AaAttributeAggregation
+name: AaAggregation
+config:
+  aa_base_url: "http://aa-api:8000"
+  timeout_seconds: 3
+  user_id_attribute: "uid"
+  source_attribute: "eduPersonEntitlement"
+  target_attribute: "edupersonentitlement"

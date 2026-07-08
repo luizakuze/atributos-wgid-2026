@@ -1,0 +1,20 @@
+attributes:
+  uid:
+    saml: [uid]
+  cn:
+    saml: [cn]
+  displayname:
+    saml: [displayName]
+  givenname:
+    saml: [givenName]
+  surname:
+    saml: [sn]
+  mail:
+    saml: [mail]
+  edupersonprincipalname:
+    saml: [eduPersonPrincipalName]
+  edupersonentitlement:
+    saml: [eduPersonEntitlement]
+
+user_id_from_attrs: [edupersonprincipalname]
+user_id_to_attr: uid

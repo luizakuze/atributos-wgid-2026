@@ -1,0 +1,47 @@
+idp-saml.gidlab.rnp.br {
+    tls /certs/fullchain.pem /certs/privkey.pem
+
+    handle /idp/* {
+        reverse_proxy https://host.docker.internal:8443 {
+            transport http {
+                tls_insecure_skip_verify
+            }
+
+            header_up Host {host}
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port 443
+        }
+    }
+
+    handle {
+        reverse_proxy idp-saml:8080 {
+            header_up Host {host}
+            header_up X-Forwarded-Proto https
+            header_up X-Forwarded-Host {host}
+            header_up X-Forwarded-Port 443
+        }
+    }
+}
+
+sp-saml.gidlab.rnp.br {
+    tls /certs/fullchain.pem /certs/privkey.pem
+
+    reverse_proxy host.docker.internal:5000 {
+        header_up Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Port 443
+    }
+}
+
+aa-api.gidlab.rnp.br {
+    tls /certs/fullchain.pem /certs/privkey.pem
+
+    reverse_proxy host.docker.internal:8000 {
+        header_up Host {host}
+        header_up X-Forwarded-Proto https
+        header_up X-Forwarded-Host {host}
+        header_up X-Forwarded-Port 443
+    }
+}

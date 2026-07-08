@@ -1,0 +1,26 @@
+services:
+  ldap:
+    build:
+      context: ./ldap-image
+    container_name: shib-ldap-case-b
+    environment:
+      LDAP_ORGANISATION: "GIdLab"
+      LDAP_DOMAIN: "gidlab.rnp.br"
+      LDAP_ADMIN_PASSWORD: "admin"
+    ports:
+      - "3890:389"
+
+  shib-idp:
+    build: .
+    container_name: shib-idp-case1
+    environment:
+      JETTY_BROWSER_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_MAX_HEAP: 1024m
+    ports:
+      - "4443:4443"
+      - "8443:8443"
+    depends_on:
+      - ldap
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

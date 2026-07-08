@@ -1,0 +1,39 @@
+BASE: https://proxy-wgid.gidlab.rnp.br
+
+COOKIE_STATE_NAME: "SATOSA_STATE"
+CONTEXT_STATE_DELETE: yes
+# Valor de laboratório - troque antes de qualquer uso além do experimento local.
+STATE_ENCRYPTION_KEY: "gidlab-cenario-d-dev-secret"
+
+INTERNAL_ATTRIBUTES: "internal_attributes.yaml"
+
+BACKEND_MODULES:
+  - "plugins/backends/saml2_backend.yaml"
+
+FRONTEND_MODULES:
+  - "plugins/frontends/saml2_frontend.yaml"
+
+MICRO_SERVICES:
+  - "plugins/microservices/idp_hinting.yaml"
+  - "plugins/microservices/aa_aggregation.yaml"
+
+LOGGING:
+  version: 1
+  formatters:
+    simple:
+      format: "[%(asctime)s] [%(levelname)s] [%(name)s.%(funcName)s] %(message)s"
+  handlers:
+    stdout:
+      class: logging.StreamHandler
+      stream: "ext://sys.stdout"
+      level: INFO
+      formatter: simple
+  loggers:
+    satosa:
+      level: INFO
+    saml2:
+      level: WARNING
+  root:
+    level: INFO
+    handlers:
+      - stdout

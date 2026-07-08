@@ -1,0 +1,85 @@
+services:
+  caddy:
+    image: caddy:2
+    container_name: caddy-case-a
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./certs:/certs:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - shib-idp
+      - sp-saml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ldap:
+    build:
+      context: ./idp-shibb/ldap-image
+    container_name: shib-ldap-case-a
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    environment:
+      LDAP_ORGANISATION: "GIdLab"
+      LDAP_DOMAIN: "gidlab.rnp.br"
+      LDAP_ADMIN_PASSWORD: "admin"
+    ports:
+      - "3890:389"
+
+  shib-idp:
+    build:
+      context: ./idp-shibb
+    container_name: shib-idp-case-a
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1280M
+    environment:
+      JETTY_BROWSER_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD: changeme
+      JETTY_MAX_HEAP: 1024m
+    ports:
+      - "4443:4443"
+      - "8443:8443"
+    volumes:
+      - ./idp-shibb/metadata/sp-saml-metadata.xml:/opt/shibboleth-idp/metadata/sp-saml-metadata.xml
+    depends_on:
+      - ldap
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      default:
+        aliases:
+          - idp-saml
+
+  sp-saml:
+    build:
+      context: ./sp-saml
+    container_name: sp-saml-case-a
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    ports:
+      - "5000:5000"
+    depends_on:
+      - shib-idp
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,54 @@
+module: satosa.backends.saml2.SAMLBackend
+name: Saml2
+config:
+  # Metadata inclui o nosso shib-idp (idp.xml local, sempre presente pro
+  # Locust testar via idp_hint) mais a metadata real da federação CAFe
+  # Expresso, buscada ao vivo (remote), pra permitir autenticar contra
+  # qualquer IdP real sem depender de cópia estática. Sem idp_hint (ver
+  # microservice IdpHinting) e com mais de um IdP na metadata, o backend
+  # cai no disco_srv abaixo.
+  disco_srv: https://ds2.cafeexpresso.rnp.br/WAYF
+  entityid_endpoint: true
+  mirror_force_authn: no
+  memorize_idp: no
+  use_memorized_idp_when_force_authn: no
+  send_requester_id: no
+  enable_metadata_reload: true
+  acs_selection_strategy: prefer_matching_host
+
+  sp_config:
+    name: "GIdLab Proxy (backend)"
+    description: "Perna SP do proxy de identidade - cenário D"
+    key_file: /opt/satosa/etc/backend.key
+    cert_file: /opt/satosa/etc/backend.crt
+    organization: {display_name: GIdLab, name: GIdLab, url: 'https://proxy-wgid.gidlab.rnp.br'}
+    contact_person:
+      - {contact_type: technical, email_address: 'mailto:gidlab@rnp.br', given_name: GIdLab}
+
+    metadata:
+      local: [idp.xml]
+      remote:
+        - url: https://ds2.cafeexpresso.rnp.br/metadata/ds-metadata.xml
+
+    entityid: https://proxy-wgid.gidlab.rnp.br/Saml2/proxy_saml2_backend.xml
+    accepted_time_diff: 60
+    # NOTA: signing_algorithm/digest_algorithm aqui NÃO têm efeito - o
+    # pysaml2 consulta Entity config via getattr(attr) sem contexto
+    # explícito, que procura "_sp_signing_algorithm" (nunca criado a
+    # partir deste YAML) e cai no default global RSA-SHA1/SHA1. O
+    # Shibboleth real rejeita RSA-SHA1 ("Message Security Error"). O
+    # default de processo é sobrescrito para SHA-256 em
+    # ../../wsgi_entrypoint.py, antes do backend ser construído.
+    service:
+      sp:
+        authn_requests_signed: true
+        want_response_signed: true
+        want_assertions_signed: true
+        allow_unsolicited: false
+        endpoints:
+          assertion_consumer_service:
+            - [https://proxy-wgid.gidlab.rnp.br/Saml2/acs/post, 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST']
+          discovery_response:
+            - [https://proxy-wgid.gidlab.rnp.br/Saml2/disco, 'urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol']
+        name_id_policy_format: urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+        name_id_format_allow_create: true

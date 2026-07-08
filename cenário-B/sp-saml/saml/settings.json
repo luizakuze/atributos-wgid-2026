@@ -1,0 +1,30 @@
+{
+    "strict": false,
+    "debug": true,
+    "sp": {
+        "entityId": "https://sp-saml.gidlab.rnp.br/saml/metadata",
+        "assertionConsumerService": {
+            "url": "https://sp-saml.gidlab.rnp.br/saml/acs",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+        },
+        "singleLogoutService": {
+            "url": "https://sp-saml.gidlab.rnp.br/logout",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "NameIDFormat": "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+        "x509cert": "MIIDITCCAgmgAwIBAgIUcSqCSSlH4JxqemHm/ywbbUJBZFowDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UEAwwVc3Atc2FtbC5naWRsYWIucm5wLmJyMB4XDTI2MDYyNDAzMzU0MloXDTM2MDYyMTAzMzU0MlowIDEeMBwGA1UEAwwVc3Atc2FtbC5naWRsYWIucm5wLmJyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq9ggamPwykILpbGVQcCK4Y+e+6UT4HEf464fubizzG09h48XlN0ZdvvdVHv168kCq8vgLYBLt2I+95HznjgBA9/7NwG2sIqNPpDswEGvvuEro6CZd+CEqTyP+ktE/4MjYpRyUJIQlpbNQVAW9brXPGPxJv5Tddxeqag81iVlcg0CQ/OOdaViQmTeRenQtV/fYnt6Cv+tgCHbxZQlyhthdheIEttnrixs9obKIT5xDPU0xkWVeGJi715sunssEPRoHst41INRfTYqWVM0hlpp3ei/ukVW8C/ag02uyo4zwnu6dpexeg46tTpwnxrMEjsDDF2+zBCvLkGPhV6KWRPbYQIDAQABo1MwUTAdBgNVHQ4EFgQURfZNquDGA/9VrMgP7WeZhm8v+wMwHwYDVR0jBBgwFoAURfZNquDGA/9VrMgP7WeZhm8v+wMwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEADWVdtc7ogTKBRp6A6Wnsv49COLX7JwZV3xeb1oe0KzmcTqW9qW+/vI8hj0nRiwsWTetCKQGNyRrH2KIM2mOTxdskaJ9njFbIULY1iiHjOyIPN93vfnAkj/r9bX/XWoJk/yY3/oUFf2H3+RTHxZpUVgkSBzlXFhAe6mPOvXgTjohEJRzg+MDOzz66JKrTgCAsmmN0VZmgweBnrFZJLo3z+SgqOiNKeebeEpYaX4vg8cYRxhR1jm/ii2hnQ3ceQtg0eGtZyUnD5SozMRiSA4JdRxLnm9hpol2vLy0WeV0iHnJpY4/jRD7hRCuDw2+UWgRQm4CzhGnTy3gQf1jZ0FeCxw==",
+        "privateKey": ""
+    },
+    "idp": {
+        "entityId": "https://idp-saml.gidlab.rnp.br/idp/shibboleth",
+        "singleSignOnService": {
+            "url": "https://idp-saml.gidlab.rnp.br/idp/profile/SAML2/Redirect/SSO",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "singleLogoutService": {
+            "url": "https://idp-saml.gidlab.rnp.br/idp/profile/SAML2/Redirect/SLO",
+            "binding": "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+        },
+        "x509cert": ""
+    }
+}

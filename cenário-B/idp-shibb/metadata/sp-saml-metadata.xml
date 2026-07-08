@@ -1,0 +1,20 @@
+<ns0:EntityDescriptor xmlns:ns0="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ns1="http://www.w3.org/2000/09/xmldsig#" entityID="https://sp-saml.gidlab.rnp.br/saml/metadata">
+    <ns0:SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <ns0:KeyDescriptor use="signing"><ns1:KeyInfo><ns1:X509Data><ns1:X509Certificate>MIIDITCCAgmgAwIBAgIUCFA+GzjLInELRnBrTNrQI3fkY1wwDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UEAwwVc3Atc2FtbC5naWRsYWIucm5wLmJyMB4XDTI2MDYyNDAzNDA0M1oXDTM2MDYyMTAzNDA0M1owIDEeMBwGA1UEAwwVc3Atc2FtbC5naWRsYWIucm5wLmJyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwzov0HhpxVAHY/qreIm1ubjJ7mGJiwTxdDmpf2zOJxLAd/IGZ2ffRx8aEG5TBovrAkpFXtQbNGxTVT2Wc8SwKJhzY2CdW9EXf17NXAEtQuqS+PUdz+oFiWBTX361CYq4BsttFoDVkBBDlUGStevtVU1XS1snQtiDK5cjTulKsa60DN9fhQo0tynybzMJCEUXQ1e9iSyYrmRO1WdtgEv9EwND02QQra406KDwA7JIvPmmgAZyvsL2fdWi6D4HIoXQrwaqFwiqOksNcuLU07zXOUQm/aAeGbHtzIRRtxiua48DwBscVWBYkPSDARmIeBgYz4tMQUsYaMebA2/PSjMxBwIDAQABo1MwUTAdBgNVHQ4EFgQUWxfS+6C13/5koLZsPcI8DB1qWckwHwYDVR0jBBgwFoAUWxfS+6C13/5koLZsPcI8DB1qWckwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAduNYlMfV/8Hj1qgxxdfc8nYUgdmQ2XfXA2rz4vsmkXXre/QslkNisjFJmwXpLv3EfiGX4rVltPtGrmoAkfRa/Yopj2XLztBS18cWiNzW1ddVClq95im+V4clpR6C/RTyJDhmayFfhYq8GenvB7uYGo0nQYFXOmcxskQHXEmtcKOJVjrE/tfa1+6Ixmyjzn4Bz2m1XPQyB62s5tPYBc1zTN63Pr8b02q81Uiy7jSi9hgXof4cfgddMElGxCQXfbZBKa81bObM5VXGoPogaCCqz3Cps+Y1yJrV+hGfbUsKejeglR2PbXBE3YWcAApkbkuooIyWiyDjBOGHwflQnUJ9hQ==</ns1:X509Certificate></ns1:X509Data></ns1:KeyInfo></ns0:KeyDescriptor><ns0:KeyDescriptor use="encryption"><ns1:KeyInfo><ns1:X509Data><ns1:X509Certificate>MIIDITCCAgmgAwIBAgIUCFA+GzjLInELRnBrTNrQI3fkY1wwDQYJKoZIhvcNAQELBQAwIDEeMBwGA1UEAwwVc3Atc2FtbC5naWRsYWIucm5wLmJyMB4XDTI2MDYyNDAzNDA0M1oXDTM2MDYyMTAzNDA0M1owIDEeMBwGA1UEAwwVc3Atc2FtbC5naWRsYWIucm5wLmJyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwzov0HhpxVAHY/qreIm1ubjJ7mGJiwTxdDmpf2zOJxLAd/IGZ2ffRx8aEG5TBovrAkpFXtQbNGxTVT2Wc8SwKJhzY2CdW9EXf17NXAEtQuqS+PUdz+oFiWBTX361CYq4BsttFoDVkBBDlUGStevtVU1XS1snQtiDK5cjTulKsa60DN9fhQo0tynybzMJCEUXQ1e9iSyYrmRO1WdtgEv9EwND02QQra406KDwA7JIvPmmgAZyvsL2fdWi6D4HIoXQrwaqFwiqOksNcuLU07zXOUQm/aAeGbHtzIRRtxiua48DwBscVWBYkPSDARmIeBgYz4tMQUsYaMebA2/PSjMxBwIDAQABo1MwUTAdBgNVHQ4EFgQUWxfS+6C13/5koLZsPcI8DB1qWckwHwYDVR0jBBgwFoAUWxfS+6C13/5koLZsPcI8DB1qWckwDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAduNYlMfV/8Hj1qgxxdfc8nYUgdmQ2XfXA2rz4vsmkXXre/QslkNisjFJmwXpLv3EfiGX4rVltPtGrmoAkfRa/Yopj2XLztBS18cWiNzW1ddVClq95im+V4clpR6C/RTyJDhmayFfhYq8GenvB7uYGo0nQYFXOmcxskQHXEmtcKOJVjrE/tfa1+6Ixmyjzn4Bz2m1XPQyB62s5tPYBc1zTN63Pr8b02q81Uiy7jSi9hgXof4cfgddMElGxCQXfbZBKa81bObM5VXGoPogaCCqz3Cps+Y1yJrV+hGfbUsKejeglR2PbXBE3YWcAApkbkuooIyWiyDjBOGHwflQnUJ9hQ==</ns1:X509Certificate></ns1:X509Data></ns1:KeyInfo></ns0:KeyDescriptor><ns0:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://sp-saml.gidlab.rnp.br/logout" />
+        <ns0:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</ns0:NameIDFormat>
+        <ns0:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://sp-saml.gidlab.rnp.br/saml/acs" index="1" />
+    </ns0:SPSSODescriptor>
+    <ns0:Organization>
+        <ns0:OrganizationName xml:lang="pt-BR">GIdLab</ns0:OrganizationName>
+        <ns0:OrganizationDisplayName xml:lang="pt-BR">GIdLab</ns0:OrganizationDisplayName>
+        <ns0:OrganizationURL xml:lang="pt-BR">https://sp-saml.gidlab.rnp.br</ns0:OrganizationURL>
+    </ns0:Organization>
+    <ns0:ContactPerson contactType="technical">
+        <ns0:GivenName>GIdLab</ns0:GivenName>
+        <ns0:EmailAddress>gidlab@rnp.br</ns0:EmailAddress>
+    </ns0:ContactPerson>
+    <ns0:ContactPerson contactType="support">
+        <ns0:GivenName>GIdLab</ns0:GivenName>
+        <ns0:EmailAddress>gidlab@rnp.br</ns0:EmailAddress>
+    </ns0:ContactPerson>
+</ns0:EntityDescriptor>

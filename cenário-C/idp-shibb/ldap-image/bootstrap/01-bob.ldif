@@ -1,0 +1,17 @@
+dn: ou=people,dc=gidlab,dc=rnp,dc=br
+objectClass: organizationalUnit
+ou: people
+
+dn: uid=bob,ou=people,dc=gidlab,dc=rnp,dc=br
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: person
+objectClass: top
+uid: bob
+cn: Bob
+cn: Bob GIdLab
+displayName: Bob GIdLab
+sn: GIdLab
+givenName: Bob
+mail: bob@idp-wgid.gidlab.rnp.br
+userPassword: bob

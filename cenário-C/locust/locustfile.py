@@ -1,0 +1,654 @@
+from locust import HttpUser, task, between, events
+from urllib.parse import urljoin
+import urllib3
+import requests
+import re
+import html
+import time
+import os
+import base64
+import gevent
+
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Descarta os primeiros WARMUP_SECONDS de medicoes (cold start do JVM
+# do shib-idp e pool de conexoes) antes de comecar a medicao real.
+WARMUP_SECONDS = int(os.getenv("LOCUST_WARMUP_SECONDS", "15"))
+
+# Numero alvo de execucoes pos-warmup; ao atingir, encerra a rodada
+# sozinha. 0 desativa (roda so por --run-time).
+TARGET_ITERATIONS = int(os.getenv("LOCUST_TARGET_ITERATIONS", "0"))
+
+_warmup_done = False
+_completed_count = 0
+
+# DS externo (ds2.cafeexpresso.rnp.br) e intermitente; timeout maior
+# evita falso negativo. Nao afeta a metrica CUSTO, medida a partir da
+# etapa seguinte.
+DS_TIMEOUT = int(os.getenv("LOCUST_DS_TIMEOUT", "60"))
+DS_MAX_RETRIES = int(os.getenv("LOCUST_DS_MAX_RETRIES", "2"))
+DS_RETRY_BACKOFF_SECONDS = 2
+
+
+def request_with_retry(request_func, *args, **kwargs):
+    attempt = 0
+
+    while True:
+        try:
+            return request_func(*args, **kwargs)
+        except requests.exceptions.RequestException:
+            if attempt >= DS_MAX_RETRIES:
+                raise
+
+            attempt += 1
+            time.sleep(DS_RETRY_BACKOFF_SECONDS)
+
+
+@events.test_start.add_listener
+def _descartar_warmup(environment, **kwargs):
+    def _reset():
+        global _warmup_done
+        environment.stats.reset_all()
+        _warmup_done = True
+        print(f"[warmup] {WARMUP_SECONDS}s concluidos - estatisticas zeradas, medicao real comecando agora")
+
+    gevent.spawn_later(WARMUP_SECONDS, _reset)
+
+
+def _register_completion(environment):
+    global _completed_count
+
+    if not _warmup_done:
+        return
+
+    _completed_count += 1
+
+    if TARGET_ITERATIONS and _completed_count >= TARGET_ITERATIONS:
+        # spawn evita deadlock: quit() direto bloquearia esperando a
+        # propria greenlet atual, que so termina apos retornar daqui.
+        gevent.spawn(environment.runner.quit)
+
+USERNAME = os.getenv("SAML_USER", "bob")
+PASSWORD = os.getenv("SAML_PASS", "bob")
+
+IDP_ENTITY_ID = os.getenv(
+    "IDP_ENTITY_ID",
+    "https://idp-saml.gidlab.rnp.br/idp/shibboleth"
+)
+
+AA_URL = os.getenv(
+    "AA_URL",
+    "https://aa-api.gidlab.rnp.br/attributes/bob"
+)
+
+
+def fire_custom(environment, name, response_time, response_length=0, exception=None):
+    environment.events.request.fire(
+        request_type="CUSTOM",
+        name=name,
+        response_time=response_time,
+        response_length=response_length,
+        exception=exception,
+        context={}
+    )
+
+
+def clean_text(value):
+    return html.unescape(value).strip() if value else ""
+
+
+def get_first_link_matching(page, patterns):
+    links = re.findall(
+        r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
+        page,
+        re.I | re.S
+    )
+
+    for href, label in links:
+        label_clean = re.sub(r"<[^>]+>", "", label)
+        label_clean = clean_text(label_clean)
+
+        for pattern in patterns:
+            if pattern.lower() in href.lower() or pattern.lower() in label_clean.lower():
+                return clean_text(href)
+
+    return None
+
+
+def get_all_forms(page):
+    return re.findall(r'<form.*?</form>', page, re.I | re.S)
+
+
+def get_form_action(form_html):
+    match = re.search(r'<form[^>]+action=["\']([^"\']+)["\']', form_html, re.I)
+    return clean_text(match.group(1)) if match else None
+
+
+def get_form_method(form_html):
+    match = re.search(r'<form[^>]+method=["\']([^"\']+)["\']', form_html, re.I)
+    return clean_text(match.group(1)).lower() if match else "post"
+
+
+def get_inputs(form_html):
+    data = {}
+
+    for match in re.finditer(r'<input[^>]*>', form_html, re.I):
+        tag = match.group(0)
+
+        name_match = re.search(r'name=["\']([^"\']+)["\']', tag, re.I)
+        if not name_match:
+            continue
+
+        value_match = re.search(r'value=["\']([^"\']*)["\']', tag, re.I)
+
+        name = clean_text(name_match.group(1))
+        value = clean_text(value_match.group(1)) if value_match else ""
+
+        data[name] = value
+
+    return data
+
+
+def find_ds_form(page):
+    forms = get_all_forms(page)
+    return forms[0] if forms else None
+
+
+def fill_ds_data(ds_form):
+    data = get_inputs(ds_form)
+
+    possible_fields = [
+        "entityID",
+        "user_idp",
+        "idp",
+        "origin",
+        "selected_idp",
+        "shib_idp_ls_value",
+        "IdP",
+        "idpentityid",
+    ]
+
+    for field in possible_fields:
+        data[field] = IDP_ENTITY_ID
+
+    return data
+
+
+def find_login_form(page):
+    for form in get_all_forms(page):
+        lower = form.lower()
+
+        if (
+            "j_username" in lower
+            or "j_password" in lower
+            or "username" in lower
+            or "password" in lower
+        ):
+            return form
+
+    return None
+
+
+def find_saml_form(page):
+    forms = get_all_forms(page)
+
+    for form in forms:
+        lower = form.lower()
+        data = get_inputs(form)
+
+        if "samlresponse" in lower or "SAMLResponse" in data:
+            return form
+
+    return None
+
+
+def find_redirect_url(page):
+    patterns = [
+        r'window\.location\.href\s*=\s*["\']([^"\']+)["\']',
+        r'window\.location\s*=\s*["\']([^"\']+)["\']',
+        r'location\.href\s*=\s*["\']([^"\']+)["\']',
+        r'location\.replace\(["\']([^"\']+)["\']\)',
+        r'<meta[^>]+http-equiv=["\']refresh["\'][^>]+content=["\'][^;]+;\s*url=([^"\']+)["\']',
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, page, re.I)
+
+        if match:
+            return clean_text(match.group(1))
+
+    return None
+
+
+def get_saml_response_size_bytes(saml_data):
+    saml_response = saml_data.get("SAMLResponse")
+
+    if not saml_response:
+        return 0
+
+    missing_padding = len(saml_response) % 4
+
+    if missing_padding:
+        saml_response += "=" * (4 - missing_padding)
+
+    decoded = base64.b64decode(saml_response)
+
+    return len(decoded)
+
+
+def debug_page(label, response):
+    print("=" * 80)
+    print(label)
+    print("URL:", response.url)
+    print("STATUS:", response.status_code)
+    print("HEADERS:", dict(response.headers))
+    print("HTML:")
+    print(response.text[:4000])
+    print("=" * 80)
+
+
+class SAMLAgregacaoSPUser(HttpUser):
+    """
+    Cenario C - Agregacao pelo SP (Figura 1c do artigo).
+    O IdP autentica o usuario e emite uma assercao SAML apenas com os
+    atributos institucionais basicos. E o proprio SP quem consulta a
+    Autoridade de Atributos (AA) apos receber a assercao, agregando os
+    atributos localmente antes de decidir o acesso. Fluxo com 8
+    mensagens (Tabela 1).
+
+    Mensagens 6 e 7 (SP consulta a AA / AA retorna ao SP) acontecem
+    dentro do proprio processamento do POST /saml/acs no SP, portanto
+    nao sao observaveis como uma chamada de rede separada a partir do
+    cliente. Para isolar essa latencia (mesma tecnica usada no cenario
+    B para a chamada do IdP a AA), o script faz uma chamada direta e
+    equivalente a AA logo apos o SP confirmar o recebimento da
+    assercao, e reporta o par de mensagens 6/7 nessa medicao isolada.
+    """
+
+    wait_time = between(1, 3)
+
+    def on_start(self):
+        self.base_url = self.host.rstrip("/")
+
+    @task
+    def fluxo_agregacao_sp_1_a_8(self):
+        session = requests.Session()
+        session.verify = False
+
+        total_start = time.time()
+
+        try:
+            step_start = time.time()
+
+            r1 = session.get(
+                f"{self.base_url}/",
+                allow_redirects=True,
+                timeout=20
+            )
+
+            step_ms = (time.time() - step_start) * 1000
+
+            fire_custom(
+                self.environment,
+                "1 - Usuario solicita acesso ao SP",
+                step_ms,
+                len(r1.content or b""),
+                None if r1.ok else Exception(f"HTTP {r1.status_code}")
+            )
+
+            if not r1.ok:
+                debug_page("Falha no passo 1", r1)
+                return
+
+            login_href = get_first_link_matching(
+                r1.text,
+                [
+                    "Login via Federação",
+                    "Login via Federacao",
+                    "login",
+                    "federação",
+                    "federacao"
+                ]
+            )
+
+            if not login_href:
+                print("Nao encontrou link de login na pagina inicial.")
+                print(r1.text[:3000])
+                return
+
+            login_url = urljoin(r1.url, login_href)
+
+            step_start = time.time()
+
+            r2 = session.get(
+                login_url,
+                allow_redirects=False,
+                timeout=20
+            )
+
+            step_ms = (time.time() - step_start) * 1000
+
+            fire_custom(
+                self.environment,
+                "2 - SP encaminha a solicitacao ao DS",
+                step_ms,
+                len(r2.content or b""),
+                None if r2.status_code in [301, 302, 303, 307, 308]
+                else Exception(f"HTTP {r2.status_code}")
+            )
+
+            if r2.status_code not in [301, 302, 303, 307, 308]:
+                debug_page("Falha no passo 2", r2)
+                return
+
+            ds_url = urljoin(r2.url, r2.headers.get("Location"))
+
+            step_start = time.time()
+
+            r3 = request_with_retry(
+                session.get,
+                ds_url,
+                allow_redirects=True,
+                timeout=DS_TIMEOUT
+            )
+
+            ds_form = find_ds_form(r3.text)
+
+            if not ds_form:
+                step_ms = (time.time() - step_start) * 1000
+
+                fire_custom(
+                    self.environment,
+                    "3 - Usuario e redirecionado ao IdP para autenticacao",
+                    step_ms,
+                    len(r3.content or b""),
+                    Exception("Formulario do DS nao encontrado")
+                )
+
+                debug_page("Falha no passo 3 - formulario DS nao encontrado", r3)
+                return
+
+            ds_action = get_form_action(ds_form) or r3.url
+            ds_method = get_form_method(ds_form)
+            ds_data = fill_ds_data(ds_form)
+            ds_submit_url = urljoin(r3.url, ds_action)
+
+            if ds_method == "get":
+                r3b = request_with_retry(
+                    session.get,
+                    ds_submit_url,
+                    params=ds_data,
+                    allow_redirects=True,
+                    timeout=DS_TIMEOUT
+                )
+            else:
+                r3b = request_with_retry(
+                    session.post,
+                    ds_submit_url,
+                    data=ds_data,
+                    allow_redirects=True,
+                    timeout=DS_TIMEOUT
+                )
+
+            redirect_url = find_redirect_url(r3b.text)
+
+            if redirect_url:
+                redirect_url = urljoin(r3b.url, redirect_url)
+
+                r3b = request_with_retry(
+                    session.get,
+                    redirect_url,
+                    allow_redirects=True,
+                    timeout=DS_TIMEOUT
+                )
+
+            step_ms = (time.time() - step_start) * 1000
+            login_form = find_login_form(r3b.text)
+
+            fire_custom(
+                self.environment,
+                "3 - Usuario e redirecionado ao IdP para autenticacao",
+                step_ms,
+                len(r3b.content or b""),
+                None if login_form else Exception("Tela de login do IdP nao encontrada")
+            )
+
+            if not login_form:
+                debug_page("Falha no passo 3 - tela de login nao encontrada", r3b)
+                return
+
+            # inicio da metrica CUSTO (mensagem 4 ao final)
+            msg4_start = time.time()
+            step_start = msg4_start
+
+            login_action = get_form_action(login_form)
+            login_data = get_inputs(login_form)
+
+            login_data["j_username"] = USERNAME
+            login_data["j_password"] = PASSWORD
+            login_data["_eventId_proceed"] = "Login"
+
+            # Evita marcar checkbox opcional
+            login_data.pop("donotcache", None)
+            login_data.pop("_shib_idp_revokeConsent", None)
+
+            # Compatibilidade caso o IdP use nomes genericos
+            login_data["username"] = USERNAME
+            login_data["password"] = PASSWORD
+
+            login_post_url = urljoin(r3b.url, login_action)
+
+            r4 = session.post(
+                login_post_url,
+                data=login_data,
+                allow_redirects=True,
+                timeout=20
+            )
+
+            step_ms = (time.time() - step_start) * 1000
+
+            voltou_para_login = (
+                "j_username" in r4.text
+                and "j_password" in r4.text
+                and "Web Login Service" in r4.text
+            )
+
+            fire_custom(
+                self.environment,
+                "4 - IdP autentica o usuario e emite a assercao SAML inicial",
+                step_ms,
+                len(r4.content or b""),
+                None if r4.ok and not voltou_para_login
+                else Exception("Login no IdP falhou ou voltou para tela de login")
+            )
+
+            if not r4.ok or voltou_para_login:
+                debug_page("Falha no passo 4 - login nao autenticou", r4)
+                return
+
+            step_start = time.time()
+
+            saml_form = find_saml_form(r4.text)
+
+            if not saml_form:
+                redirect_url = find_redirect_url(r4.text)
+
+                if redirect_url:
+                    redirect_url = urljoin(r4.url, redirect_url)
+
+                    r4 = session.get(
+                        redirect_url,
+                        allow_redirects=True,
+                        timeout=20
+                    )
+
+                    saml_form = find_saml_form(r4.text)
+
+            if not saml_form:
+                step_ms = (time.time() - step_start) * 1000
+
+                fire_custom(
+                    self.environment,
+                    "5 - Assercao SAML encaminhada ao SP",
+                    step_ms,
+                    0,
+                    Exception("Formulario SAMLResponse nao encontrado")
+                )
+
+                debug_page("Falha no passo 5 - resposta apos login", r4)
+                return
+
+            saml_action = get_form_action(saml_form)
+            saml_data = get_inputs(saml_form)
+
+            if "SAMLResponse" not in saml_data:
+                step_ms = (time.time() - step_start) * 1000
+
+                fire_custom(
+                    self.environment,
+                    "5 - Assercao SAML encaminhada ao SP",
+                    step_ms,
+                    0,
+                    Exception("Campo SAMLResponse nao encontrado")
+                )
+
+                print("Formulario encontrado, mas sem campo SAMLResponse:")
+                print(saml_form[:3000])
+                return
+
+            saml_response_size_bytes = get_saml_response_size_bytes(saml_data)
+
+            fire_custom(
+                self.environment,
+                "Tamanho da assercao SAML em bytes",
+                0,
+                saml_response_size_bytes,
+                None
+            )
+
+            acs_url = urljoin(r4.url, saml_action)
+
+            r5 = session.post(
+                acs_url,
+                data=saml_data,
+                allow_redirects=True,
+                timeout=20
+            )
+
+            step_ms = (time.time() - step_start) * 1000
+
+            sp_recebeu = (
+                "Atributos recebidos" in r5.text
+                or "SP SAML Demo" in r5.text
+                or "IdP selecionado" in r5.text
+            )
+
+            fire_custom(
+                self.environment,
+                "5 - Assercao SAML encaminhada ao SP",
+                step_ms,
+                len(r5.content or b""),
+                None if r5.ok and sp_recebeu else Exception(f"HTTP {r5.status_code}")
+            )
+
+            if not r5.ok or not sp_recebeu:
+                debug_page("Falha no passo 5 - SP nao confirmou o recebimento", r5)
+                return
+
+            step_start = time.time()
+            aa_exception = None
+            aa_len = 0
+
+            try:
+                r6 = requests.get(
+                    AA_URL,
+                    verify=False,
+                    timeout=20
+                )
+
+                aa_len = len(r6.content or b"")
+
+                if not r6.ok:
+                    aa_exception = Exception(f"AA HTTP {r6.status_code}")
+
+            except Exception as exc:
+                aa_exception = exc
+
+            step_ms = (time.time() - step_start) * 1000
+
+            fire_custom(
+                self.environment,
+                "6/7 - SP consulta a AA e recebe os atributos complementares",
+                step_ms,
+                aa_len,
+                aa_exception
+            )
+
+            step_start = time.time()
+
+            r8 = session.get(
+                f"{self.base_url}/",
+                allow_redirects=True,
+                timeout=20
+            )
+
+            step_ms = (time.time() - step_start) * 1000
+
+            final_ok = (
+                "Atributos recebidos" in r8.text
+                or "SP SAML Demo" in r8.text
+                or "IdP selecionado" in r8.text
+            )
+
+            fire_custom(
+                self.environment,
+                "8 - SP agrega os atributos e decide o acesso",
+                step_ms,
+                len(r8.content or b""),
+                None if final_ok else Exception("Pagina final autenticada nao confirmada")
+            )
+
+            if not final_ok:
+                debug_page("Falha no passo 8", r8)
+                return
+
+            # soma real por amostra, nao soma de medianas de etapas
+            custo_ms = (time.time() - msg4_start) * 1000
+
+            fire_custom(
+                self.environment,
+                "CUSTO - Mensagem 4 ao final (medido direto)",
+                custo_ms,
+                len(r8.content or b""),
+                None
+            )
+
+            _register_completion(self.environment)
+
+            total_ms = (time.time() - total_start) * 1000
+
+            fire_custom(
+                self.environment,
+                "TOTAL - Fluxo completo",
+                total_ms,
+                len(r8.content or b""),
+                None
+            )
+
+            print("LOGIN OK - fluxo 1 a 8 completo")
+            print("Tempo total ms:", total_ms)
+            print("Tamanho SAMLResponse decodificada bytes:", saml_response_size_bytes)
+
+        except Exception as exc:
+            total_ms = (time.time() - total_start) * 1000
+
+            fire_custom(
+                self.environment,
+                "TOTAL - Fluxo completo",
+                total_ms,
+                0,
+                exc
+            )
+
+            print("Erro geral no fluxo:", repr(exc))
