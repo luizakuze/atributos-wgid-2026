@@ -607,7 +607,6 @@ def index():
             <div style="max-width: 900px; margin: 0 auto;">
                 <span class="badge badge-inverted">{html.escape(SCENARIO_LABEL)}</span>
                 <h1 style="margin: 12px 0 4px; font-size: 24px;">Atributos recebidos</h1>
-                <p style="margin: 0; opacity: .85; font-size: 14px;">Atributos institucionais da asserção SAML + atributos complementares agregados pelo próprio SP junto à AA</p>
             </div>
         </header>
 
