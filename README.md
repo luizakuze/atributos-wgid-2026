@@ -1,9 +1,6 @@
 # atributos-wgid26
 
-Ambiente de experimentação para avaliação de modelos de obtenção e
-agregação de atributos em autorização federada (SAML2). Repositório de
-apoio ao artigo *"Análise Experimental de Modelos de Agregação de
-Atributos para Autorização em Ambientes Federados"*.
+Ambiente de experimentação para avaliação de modelos de obtenção e agregação de atributos em autorização federada com SAML 2.0. Repositório de apoio ao artigo *"Avaliação Experimental de Estratégias de Agregação de Atributos em Federações Acadêmicas"*.
 
 ## Arquitetura
 
