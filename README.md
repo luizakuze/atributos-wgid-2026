@@ -47,9 +47,9 @@ na internet e falha:
 ```bash
 # clonar o repositório
 git clone https://github.com/luizakuze/atributos-wgid26    
-cd atributos-wgid26/cenário-X
 
 # subir a instância do cenário escolhido
+cd atributos-wgid26/cenário-X
 docker compose up --build    
 # testar em https://sp-saml.gidlab.rnp.br
 
@@ -209,7 +209,7 @@ O ambiente foi estendido com componentes de rede adicionais: dois IdPs extras no
 | $N=3$                  |                  3 |                 3 |                    1 |
 | $N=M$                  |                $M$ |               $M$ |                    1 |
 
-Em B e C, cada instituição adicional exige uma nova rota de rede até a AA, resultando em crescimento linear ($O(N)$). No proxy, apenas o próprio proxy acessa diretamente a AA, independentemente do número de IdPs ou SPs conectados, mantendo o crescimento constante ($O(1)$).
+Em B e C, cada instituição adicional exige uma nova rota de rede até a AA, resultando em crescimento linear (O(N)). No proxy, apenas o próprio proxy acessa diretamente a AA, independentemente do número de IdPs ou SPs conectados, mantendo o crescimento constante (O(1)).
 
 ## Considerações finais
 
