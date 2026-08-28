@@ -29,6 +29,12 @@ no diretório correspondente).
 
 ## Execução
 
+> [!WARNING]
+>
+> * A execução dos cenários depende do registro prévio das entidades envolvidas (IdPs, SPs e proxy, quando aplicável) na metadata da federação CAFe Expresso (https://ds2.cafeexpresso.rnp.br/metadata/ds-metadata.xml), federação SAML de experimentação utilizada neste trabalho.
+> * Para solicitar o cadastro ou a atualização das entidades, entre em contato com **[atendimento@rnp.br](mailto:atendimento@rnp.br)**.
+
+
 Antes de subir qualquer cenário, o `/etc/hosts` (ou DNS local) precisa
 resolver para `127.0.0.1` os hostnames usados pelo cenário escolhido.
 Sem esse passo, o navegador (ou o Locust) tenta resolver esses nomes
